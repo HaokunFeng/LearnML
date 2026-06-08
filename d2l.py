@@ -232,6 +232,13 @@ def softmax_net(X, W, b): #@save
     """softmax回归模型"""
     return softmax(torch.matmul(X.reshape((-1, W.shape[0])), W) + b)
 
+# activation
+# --------------------------------------------------------------------------
+def relu(X):
+    """ReLU激活函数"""
+    a = torch.zeros_like(X)
+    return torch.max(X, a)
+
 
 # loss
 # --------------------------------------------------------------------------
@@ -242,6 +249,16 @@ def squared_loss(y_hat, y): #@save
 def cross_entropy(y_hat, y): #@save
     """交叉熵损失"""
     return - torch.log(y_hat[range(len(y_hat)), y])
+
+def evaluate_loss(net, data_iter, loss): #@save
+    """评估给定数据集上模型的损失"""
+    metric = Accumulator(2)
+    for X, y in data_iter:
+        out = net(X)
+        y = y.reshape(out.shape)
+        l = loss(out, y)
+        metric.add(l.sum(), l.numel())
+    return metric[0] / metric[1]
 
 # optimization
 # --------------------------------------------------------------------------
